@@ -220,6 +220,7 @@ func (c *controller) onEvent(namespacedName types.NamespacedName) error {
 		// Set this label so that we do not compare configs and just push.
 		Labels: map[string]string{constants.AlwaysPushLabel: "true"},
 	}
+	IngressLog.Infof("-------ingress---------->vsmetadata", vsmetadata)
 	efmetadata := config.Meta{
 		Name:             ing.Name + "-" + "envoyfilter",
 		Namespace:        ing.Namespace,
@@ -234,7 +235,7 @@ func (c *controller) onEvent(namespacedName types.NamespacedName) error {
 		// Set this label so that we do not compare configs and just push.
 		Labels: map[string]string{constants.AlwaysPushLabel: "true"},
 	}
-
+	IngressLog.Infof("--------ingress--------->gatewaymetadata", gatewaymetadata)
 	for _, f := range c.destinationRuleHandlers {
 		f(config.Config{Meta: drmetadata}, config.Config{Meta: drmetadata}, event)
 	}

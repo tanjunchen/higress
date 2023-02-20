@@ -325,6 +325,7 @@ func (m *IngressConfig) convertGateways(configs []common.WrapperConfig) []config
 			Spec: gateway.Gateway,
 		})
 	}
+	IngressLog.Infof("【Gateways】%v", out)
 	return out
 }
 
@@ -445,6 +446,7 @@ func (m *IngressConfig) convertVirtualService(configs []common.WrapperConfig) []
 
 	// We generate some specific envoy filter here to avoid duplicated computation.
 	m.convertEnvoyFilter(&convertOptions)
+	IngressLog.Infof("【VirtualService】 %v", out)
 	return out
 }
 
@@ -533,6 +535,7 @@ func (m *IngressConfig) convertServiceEntry([]common.WrapperConfig) []config.Con
 			Spec: se.ServiceEntry,
 		})
 	}
+	IngressLog.Infof("【ServiceEntry】 %v", out)
 	return out
 }
 
@@ -597,6 +600,7 @@ func (m *IngressConfig) convertDestinationRule(configs []common.WrapperConfig) [
 			Spec: dr.DestinationRule,
 		})
 	}
+	IngressLog.Infof("【DestinationRule】 %v", out)
 	return out
 }
 

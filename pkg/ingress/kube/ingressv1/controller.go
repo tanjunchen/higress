@@ -17,6 +17,7 @@ package ingressv1
 import (
 	"errors"
 	"fmt"
+	"github.com/hashicorp/go-multierror"
 	"path"
 	"reflect"
 	"regexp"
@@ -24,7 +25,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/hashicorp/go-multierror"
 	networking "istio.io/api/networking/v1alpha3"
 	"istio.io/istio/pilot/pkg/model"
 	"istio.io/istio/pilot/pkg/model/credentials"
@@ -195,6 +195,7 @@ func (c *controller) onEvent(namespacedName types.NamespacedName) error {
 		if err != nil {
 			return err
 		}
+		IngressLog.Infof("xxxxxxxxx %s xxxxxxxxx %s", namespacedName, event)
 		if !shouldProcess {
 			IngressLog.Infof("no need process, ingress %s", namespacedName)
 			return nil
@@ -229,6 +230,8 @@ func (c *controller) onEvent(namespacedName types.NamespacedName) error {
 		// Set this label so that we do not compare configs and just push.
 		Labels: map[string]string{constants.AlwaysPushLabel: "true"},
 	}
+	IngressLog.Infof("----ingressv1-----vsmetadata-------->", vsmetadata)
+	IngressLog.Infof("------ingressv1-----gatewaymetadata------>", gatewaymetadata)
 
 	for _, f := range c.destinationRuleHandlers {
 		f(config.Config{Meta: drmetadata}, config.Config{Meta: drmetadata}, event)
@@ -1026,12 +1029,16 @@ func resolveNamedPort(service *ingress.IngressServiceBackend, namespace string, 
 
 func (c *controller) shouldProcessIngressWithClass(ingress *ingress.Ingress, ingressClass *ingress.IngressClass) bool {
 	if class, exists := ingress.Annotations[kube.IngressClassAnnotation]; exists {
+		//fmt.Println("class", class)
 		switch c.options.IngressClass {
 		case "":
+			//fmt.Println("AAA")
 			return true
 		case common.DefaultIngressClass:
+			//fmt.Println("BBB")
 			return class == "" || class == common.DefaultIngressClass
 		default:
+			//fmt.Println("CCC", c.options.IngressClass, "----", class)
 			return c.options.IngressClass == class
 		}
 	} else if ingressClass != nil {
@@ -1059,14 +1066,17 @@ func (c *controller) shouldProcessIngress(i *ingress.Ingress) (bool, error) {
 	var class *ingress.IngressClass
 	if c.classes != nil && i.Spec.IngressClassName != nil {
 		classCache, err := c.classes.Lister().Get(*i.Spec.IngressClassName)
+		//fmt.Println(err)
 		if err != nil && !kerrors.IsNotFound(err) {
 			return false, fmt.Errorf("failed to get ingress class %v from cluster %s: %v", i.Spec.IngressClassName, c.options.ClusterId, err)
 		}
 		class = classCache
 	}
 
+	//IngressLog.Infof("the value of ingress =======> %v", class)
 	// first check ingress class
-	if c.shouldProcessIngressWithClass(i, class) {
+	flag := c.shouldProcessIngressWithClass(i, class)
+	if flag {
 		// then check namespace
 		switch c.options.WatchNamespace {
 		case "":

@@ -169,6 +169,8 @@ func NewServer(args *ServerArgs) (*Server, error) {
 		s.initAuthenticators,
 	}
 
+	log.Infof("【tanjunchen】 server args %v", args)
+
 	for _, f := range initFuncList {
 		if err := f(); err != nil {
 			return nil, err

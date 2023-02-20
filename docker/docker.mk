@@ -16,6 +16,8 @@ docker.higress: BUILD_ARGS=--build-arg BASE_VERSION=${BASE_VERSION} --build-arg 
 docker.higress: $(OUT_LINUX)/higress
 docker.higress: docker/Dockerfile.higress
 	$(HIGRESS_DOCKER_RULE)
+	docker tag higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/higress:${TAG} docker.io/tanjunchen/higress:${TAG}
+	docker push docker.io/tanjunchen/higress:${TAG}
 
 # DOCKER_BUILD_VARIANTS ?=debug distroless
 # Base images have two different forms:

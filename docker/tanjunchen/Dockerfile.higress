@@ -1,0 +1,7 @@
+FROM higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/base:2022-10-27T19-02-22
+
+COPY higress /usr/local/bin/higress
+
+USER 1337:1337
+
+ENTRYPOINT ["/usr/local/bin/higress"]
